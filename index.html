@@ -810,81 +810,102 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
     </section>
 
     <!-- ════════════════════════════════════════════
-         PANEL 7 — Innovation & AI Integration
+         PANEL 7 — Innovation & AI Integration (Chloe)
          ════════════════════════════════════════════ -->
     <section id="p7" class="panel-section">
 
-      <div class="g2" style="align-items:start">
+      <!-- Context narrative -->
+      <div class="card">
+        <div class="card-hd"><span class="ci">🤖</span> AI ROI Explorer for ERP Cloud Migration</div>
+        <p style="font-size:.79rem;color:var(--muted2);line-height:1.7">
+          <strong style="color:var(--text)">How this relates to AWS ERP analytics:</strong> Moving ERP workloads to the cloud
+          (for example on AWS) unlocks scalable storage, managed databases, and AI services.
+          <strong>AI investment</strong> funds models, MLOps, and integration that turn ERP data into
+          forecasts and automation. <strong>Data quality</strong> determines whether those models are
+          trustworthy — poor master data or inconsistent fields cap value no matter how much
+          you spend. This explorer illustrates that tradeoff with a simple ROI curve.
+        </p>
+      </div>
 
-        <!-- Controls -->
+      <div class="g32" style="align-items:start">
+
+        <!-- Controls (left column) -->
         <div>
           <div class="card">
-            <div class="card-hd"><span class="ci">⚙️</span> Simulation Inputs</div>
-            <p style="font-size:.77rem;color:var(--muted);margin-bottom:.9rem;line-height:1.6">
-              Simulate ROI sensitivity to AI investment level and data quality. Adjust sliders to explore optimal investment zones and data quality thresholds.
-            </p>
+            <div class="card-hd"><span class="ci">⚙️</span> Inputs</div>
             <div class="ig">
-              <label>AI Investment: <strong id="p7-inv-val" style="color:var(--text)">$150,000</strong></label>
-              <input type="range" id="p7-inv" min="0" max="500000" step="5000" value="150000" oninput="renderP7()">
+              <label>AI Investment ($): <strong id="p7-inv-val" style="color:var(--text)">$180,000</strong></label>
+              <input type="range" id="p7-inv" min="0" max="500000" step="5000" value="180000" oninput="renderP7()">
               <div class="slider-ticks"><span>$0</span><span>$250K</span><span>$500K</span></div>
+              <div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">Annual or program-level AI spend (models, tooling, integration).</div>
             </div>
             <div class="ig" style="margin-top:.6rem">
-              <label>Data Quality (%): <strong id="p7-qual-val" style="color:var(--text)">70%</strong></label>
-              <input type="range" id="p7-qual" min="0" max="100" step="1" value="70" oninput="renderP7()">
+              <label>Data Quality (%): <strong id="p7-qual-val" style="color:var(--text)">72%</strong></label>
+              <input type="range" id="p7-qual" min="0" max="100" step="1" value="72" oninput="renderP7()">
               <div class="slider-ticks"><span>0%</span><span>50%</span><span>100%</span></div>
+              <div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">0% = fragmented/inaccurate ERP data; 100% = governed, complete master data.</div>
             </div>
           </div>
 
-          <!-- KPI Cards -->
-          <div class="g2" style="margin-bottom:.85rem">
-            <div class="mc"><div class="ml">Projected ROI</div><div class="mv" id="p7-m-roi">—</div></div>
-            <div class="mc"><div class="ml">Net Gain (5-yr)</div><div class="mv" id="p7-m-net">—</div></div>
+          <!-- Modeled ROI metric -->
+          <div class="mc" style="margin-bottom:.85rem">
+            <div class="ml">Modeled ROI</div>
+            <div class="mv" id="p7-m-roi" style="font-size:1.8rem">—</div>
           </div>
-          <div class="g2" style="margin-bottom:.85rem">
+
+          <!-- Additional KPI Cards -->
+          <div class="g3" style="margin-bottom:.85rem">
+            <div class="mc"><div class="ml">5-yr Net Gain</div><div class="mv" id="p7-m-net">—</div></div>
             <div class="mc"><div class="ml">Efficiency Score</div><div class="mv" id="p7-m-eff">—</div></div>
-            <div class="mc"><div class="ml">Optimal Invest.</div><div class="mv" id="p7-m-opt">$300K</div><div class="ms good">ROI plateau point</div></div>
+            <div class="mc"><div class="ml">Optimal Invest.</div><div class="mv" id="p7-m-opt">$300K</div><div class="ms good">ROI plateau</div></div>
           </div>
 
           <!-- Zone Box -->
           <div id="p7-zone-box" class="abox"></div>
         </div>
 
-        <!-- Key Findings + Data Quality Chart -->
+        <!-- Main ROI curve chart (right column, larger) -->
         <div>
           <div class="card">
-            <div class="card-hd"><span class="ci">📊</span> ROI vs. Data Quality &nbsp;<span style="color:var(--muted);font-weight:400;font-size:.7rem">(at current investment)</span></div>
-            <div class="cw" style="height:230px"><canvas id="p7-qual-chart"></canvas></div>
-          </div>
-
-          <div class="card">
-            <div class="card-hd"><span class="ci">💡</span> Key Findings</div>
-            <div style="font-size:.79rem;line-height:1.75;color:var(--muted2)">
-              <div style="margin-bottom:.5rem">
-                <span class="pill pill-green" style="margin-right:.4rem">Plateau</span>
-                <strong style="color:var(--text)">ROI plateaus after ~$300K investment</strong><br>
-                Marginal returns drop sharply beyond this threshold regardless of data quality.
-              </div>
-              <div style="margin-bottom:.5rem">
-                <span class="pill pill-amber" style="margin-right:.4rem">Quality</span>
-                <strong style="color:var(--text)">80% data quality unlocks maximum ROI</strong><br>
-                Below 60% data quality, even high AI investment yields limited returns.
-              </div>
-              <div>
-                <span class="pill pill-blue" style="margin-right:.4rem">Sweet Spot</span>
-                <strong style="color:var(--text)">$200K–$300K + ≥80% quality = optimal zone</strong><br>
-                This combination maximizes AI-driven ROI per dollar invested.
-              </div>
-            </div>
+            <div class="card-hd"><span class="ci">📈</span> ROI (%) vs AI Investment ($) — at your data quality setting</div>
+            <div class="cw" style="height:340px"><canvas id="p7-main-chart"></canvas></div>
+            <p style="font-size:.67rem;color:var(--muted);margin-top:.6rem;line-height:1.6">
+              Zones: <span style="color:var(--red);font-weight:700">Red</span> = low ROI typical of underinvestment;
+              <span style="color:var(--amber);font-weight:700">Yellow</span> = strong returns before saturation;
+              <span style="color:var(--green);font-weight:700">Green</span> = plateau / diminishing marginal returns.
+              Model is illustrative, not financial advice.
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- Main ROI curve chart -->
-      <div class="card">
-        <div class="card-hd"><span class="ci">📈</span> ROI Curve — AI Investment &nbsp;
-          <span style="color:var(--muted);font-weight:400;font-size:.7rem">(color zones: under-investment · optimal · diminishing returns)</span>
+      <!-- Data Quality chart + Key Findings -->
+      <div class="g2" style="margin-top:.1rem">
+        <div class="card">
+          <div class="card-hd"><span class="ci">📊</span> ROI vs. Data Quality &nbsp;<span style="color:var(--muted);font-weight:400;font-size:.7rem">(at current investment)</span></div>
+          <div class="cw" style="height:230px"><canvas id="p7-qual-chart"></canvas></div>
         </div>
-        <div class="cw" style="height:290px"><canvas id="p7-main-chart"></canvas></div>
+
+        <div class="card">
+          <div class="card-hd"><span class="ci">💡</span> Key Findings</div>
+          <div style="font-size:.79rem;line-height:1.75;color:var(--muted2)">
+            <div style="margin-bottom:.5rem">
+              <span class="pill pill-green" style="margin-right:.4rem">Plateau</span>
+              <strong style="color:var(--text)">ROI plateaus after ~$300K investment</strong><br>
+              Marginal returns drop sharply beyond this threshold regardless of data quality.
+            </div>
+            <div style="margin-bottom:.5rem">
+              <span class="pill pill-amber" style="margin-right:.4rem">Quality</span>
+              <strong style="color:var(--text)">80% data quality unlocks maximum gain</strong><br>
+              Poor master data or inconsistent fields cap achievable ROI even at high investment.
+            </div>
+            <div>
+              <span class="pill pill-blue" style="margin-right:.4rem">Sweet Spot</span>
+              <strong style="color:var(--text)">$120K–$300K + ≥80% quality = optimal zone</strong><br>
+              This combination maximizes AI-driven ROI per dollar invested for ERP analytics.
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1423,17 +1444,48 @@ function renderP5() {
   });
 }
 
-// ── PANEL 7 — AI ROI Sensitivity Explorer ─────────────────────────
+// ── PANEL 7 — AI ROI Explorer (Chloe's model) ────────────────────
 let p7MainChart = null, p7QualChart = null;
 
-// ROI formula: plateaus ~$300K, maximizes at ~80% data quality
-function calcAiROI(investment, dataQuality) {
-  // Investment curve: exponential approach to ceiling, ~86% of max at $300K
-  const invFactor = 1 - Math.exp(-investment / 120000);
-  // Quality factor: square-root-like curve — meaningful gain up to 80%, diminishing above
-  const qualFactor = Math.pow(dataQuality / 100, 0.55);
-  return 185 * invFactor * qualFactor; // max possible ROI ≈ 185%
+// Chloe's ROI model — saturation curve with data-quality gating
+// Investment saturates after ~$300K; data quality scales and caps ROI.
+const P7_I_SCALE = 135000;
+const P7_ROI_CEILING = 92.0;
+const P7_ZONE_UNDER = 120000;
+const P7_ZONE_OPTIMAL = 300000;
+
+function calcAiROI(investment, dataQualityPct) {
+  const inv = Math.max(0, investment);
+  const dq = Math.min(1, Math.max(0, dataQualityPct / 100));
+  const invFactor = 1 - Math.exp(-inv / P7_I_SCALE);
+  const dqFactor = 0.12 + 0.88 * Math.pow(dq, 1.85);
+  return Math.min(150, P7_ROI_CEILING * invFactor * dqFactor);
 }
+
+// Chart.js plugin: colored vertical zone bands behind data
+const p7ZonePlugin = {
+  id: 'p7Zones',
+  beforeDraw(chart) {
+    const {ctx, chartArea: {left, right, top, bottom}, scales: {x}} = chart;
+    const zones = [
+      {x0: 0,              x1: P7_ZONE_UNDER,   color: 'rgba(239,68,68,0.14)',  label: 'Underinvestment'},
+      {x0: P7_ZONE_UNDER,  x1: P7_ZONE_OPTIMAL, color: 'rgba(234,179,8,0.17)',  label: 'Optimal range'},
+      {x0: P7_ZONE_OPTIMAL,x1: 500000,           color: 'rgba(34,197,94,0.14)',  label: 'Diminishing returns'},
+    ];
+    ctx.save();
+    zones.forEach(z => {
+      const px0 = Math.max(left, x.getPixelForValue(z.x0));
+      const px1 = Math.min(right, x.getPixelForValue(z.x1));
+      ctx.fillStyle = z.color;
+      ctx.fillRect(px0, top, px1 - px0, bottom - top);
+      ctx.fillStyle = 'rgba(148,163,184,0.6)';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText(z.label, px0 + 6, top + 14);
+    });
+    ctx.restore();
+  }
+};
 
 function renderP7() {
   const inv  = parseInt($('p7-inv').value);
@@ -1443,70 +1495,88 @@ function renderP7() {
   $('p7-qual-val').textContent = qual + '%';
 
   const roi = calcAiROI(inv, qual);
-  const net5yr = inv * (roi / 100); // net 5-yr gain
-  const effScore = inv > 0 ? Math.round((roi / (inv / 10000))) : 0; // ROI per $10K
+  const net5yr = inv * (roi / 100);
+  const effScore = inv > 0 ? (roi / (inv / 10000)).toFixed(1) : '0.0';
 
   $('p7-m-roi').textContent = roi.toFixed(1) + '%';
   $('p7-m-net').textContent = '$' + Math.round(net5yr).toLocaleString();
-  $('p7-m-eff').textContent = effScore.toFixed(1);
+  $('p7-m-eff').textContent = effScore;
 
   // Zone box
   const zb = $('p7-zone-box');
-  if (inv < 100000) {
+  if (inv < P7_ZONE_UNDER) {
     zb.className = 'abox';
     zb.style.background = 'rgba(229,64,64,.1)'; zb.style.borderLeft = '4px solid var(--red)';
-    zb.innerHTML = '<strong>🔴 Under-Investment Zone (&lt; $100K)</strong>Insufficient AI spend — returns are limited. Consider increasing investment to at least $150K to reach meaningful ROI.';
-  } else if (inv <= 300000) {
+    zb.innerHTML = `<strong>🔴 Underinvestment Zone (&lt; $${(P7_ZONE_UNDER/1000)}K)</strong>Low ROI typical of underinvestment. Increase spend toward $${(P7_ZONE_UNDER/1000)}K+ for meaningful returns.`;
+  } else if (inv <= P7_ZONE_OPTIMAL) {
     zb.className = 'abox good'; zb.style.background = ''; zb.style.borderLeft = '';
-    zb.innerHTML = `<strong>🟢 Optimal Investment Zone ($100K – $300K)</strong>Best ROI per dollar invested. At $${inv.toLocaleString()} + ${qual}% data quality → <strong>${roi.toFixed(1)}% ROI</strong>. Maximize data quality here for peak returns.`;
+    zb.innerHTML = `<strong>🟡 Optimal Range ($${(P7_ZONE_UNDER/1000)}K – $${(P7_ZONE_OPTIMAL/1000)}K)</strong>Strong returns before saturation. At $${inv.toLocaleString()} + ${qual}% data quality → <strong>${roi.toFixed(1)}% ROI</strong>. Most growth happens here.`;
   } else {
     zb.className = 'abox info'; zb.style.background = ''; zb.style.borderLeft = '';
-    zb.innerHTML = `<strong>🔵 Diminishing Returns Zone (&gt; $300K)</strong>ROI gains slow significantly beyond $300K. Additional spend of $${(inv-300000).toLocaleString()} yields marginal improvement. Redirect excess budget to data quality improvements.`;
+    zb.innerHTML = `<strong>🟢 Diminishing Returns (&gt; $${(P7_ZONE_OPTIMAL/1000)}K)</strong>Plateau reached — additional $${(inv - P7_ZONE_OPTIMAL).toLocaleString()} yields marginal ROI gain. Redirect excess budget to data quality improvements.`;
   }
 
-  // ── Main chart: ROI vs Investment (with color zones) ───────────
-  const invRange = Array.from({length:101}, (_,i) => i * 5000); // $0–$500K step $5K
+  // ── Main chart: ROI vs Investment with colored zone bands ──────
+  const N = 200;
+  const invRange = Array.from({length: N + 1}, (_, i) => i * (500000 / N));
   const roiCurve = invRange.map(v => calcAiROI(v, qual));
-
-  // Segment datasets for color zones
-  const underData  = invRange.map((v,i) => v <= 100000  ? roiCurve[i] : null);
-  const optData    = invRange.map((v,i) => v >= 100000 && v <= 300000 ? roiCurve[i] : null);
-  const dimData    = invRange.map((v,i) => v >= 300000  ? roiCurve[i] : null);
-  const invLabels  = invRange.map(v => v === 0 ? '$0' : v % 100000 === 0 ? '$'+(v/1000)+'K' : '');
+  const roiMax = Math.max(25, Math.max(...roiCurve) * 1.15);
 
   if (p7MainChart) p7MainChart.destroy();
   p7MainChart = new Chart($('p7-main-chart'), {
-    type:'line',
-    data:{
-      labels: invLabels,
-      datasets:[
-        {label:'Under-Investment (< $100K)',data:underData,borderColor:'rgba(229,64,64,.9)',backgroundColor:'rgba(229,64,64,.08)',borderWidth:2.5,tension:.4,fill:true,spanGaps:false,pointRadius:0},
-        {label:'Optimal Zone ($100K–$300K)',data:optData,borderColor:'rgba(39,167,106,.9)',backgroundColor:'rgba(39,167,106,.1)',borderWidth:2.5,tension:.4,fill:true,spanGaps:false,pointRadius:0},
-        {label:'Diminishing Returns (> $300K)',data:dimData,borderColor:'rgba(79,123,255,.9)',backgroundColor:'rgba(79,123,255,.08)',borderWidth:2.5,tension:.4,fill:true,spanGaps:false,pointRadius:0},
-        // Current investment marker
+    type: 'scatter',
+    data: {
+      datasets: [
         {
-          label:`Current: $${inv.toLocaleString()}`,
-          data: invRange.map((v,i) => Math.abs(v-inv) < 3000 ? roiCurve[i] : null),
-          borderColor:'rgba(240,169,48,1)',backgroundColor:'rgba(240,169,48,1)',
-          pointRadius:8,pointStyle:'star',showLine:false,
+          label: 'ROI vs Investment',
+          data: invRange.map((v, i) => ({x: v, y: roiCurve[i]})),
+          showLine: true,
+          borderColor: '#2563eb',
+          backgroundColor: 'transparent',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+        },
+        {
+          label: 'Current selection',
+          data: [{x: inv, y: roi}],
+          pointRadius: 12,
+          pointBackgroundColor: '#dc2626',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointStyle: 'circle',
+          showLine: false,
         },
       ]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{position:'top',labels:{color:'#7488a8',font:{size:11},boxWidth:12,filter:i=>i.text!==''}},
-        tooltip:{callbacks:{label:c=>`ROI: ${c.raw !== null ? c.raw.toFixed(1) : '—'}%`}},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {position: 'bottom', labels: {color: '#7488a8', font: {size: 11}, boxWidth: 12, usePointStyle: true}},
+        tooltip: {callbacks: {label: c => `Investment: $${c.raw.x.toLocaleString()}  |  ROI: ${c.raw.y.toFixed(1)}%`}},
       },
-      scales:{
-        x:{ticks:{color:'#7488a8',maxRotation:0,autoSkip:true},grid:{color:'rgba(31,45,74,.5)'},title:{display:true,text:'AI Investment ($)',color:'#7488a8',font:{size:11}}},
-        y:{ticks:{color:'#7488a8',callback:v=>v.toFixed(0)+'%'},grid:{color:'rgba(31,45,74,.5)'},title:{display:true,text:'Projected ROI (%)',color:'#7488a8',font:{size:11}},min:0,max:200},
-      }
-    }
+      scales: {
+        x: {
+          type: 'linear', min: 0, max: 500000,
+          ticks: {color: '#7488a8', callback: v => '$' + (v/1000) + 'K'},
+          grid: {color: 'rgba(31,45,74,.5)'},
+          title: {display: true, text: 'AI Investment ($)', color: '#7488a8', font: {size: 11}},
+        },
+        y: {
+          min: 0, max: Math.min(105, roiMax),
+          ticks: {color: '#7488a8', callback: v => v.toFixed(0) + '%'},
+          grid: {color: 'rgba(31,45,74,.5)'},
+          title: {display: true, text: 'ROI (%)', color: '#7488a8', font: {size: 11}},
+        },
+      },
+      interaction: {mode: 'nearest', axis: 'x', intersect: false},
+    },
+    plugins: [p7ZonePlugin],
   });
 
   // ── Quality chart: ROI vs Data Quality at current investment ───
-  const qualRange = Array.from({length:101}, (_,i) => i);
+  const qualRange = Array.from({length: 101}, (_, i) => i);
   const qualCurve = qualRange.map(q => calcAiROI(inv, q));
   const qualColors = qualRange.map(q =>
     q < 60 ? 'rgba(229,64,64,.7)' : q < 80 ? 'rgba(240,169,48,.7)' : 'rgba(39,167,106,.7)'
@@ -1514,28 +1584,28 @@ function renderP7() {
 
   if (p7QualChart) p7QualChart.destroy();
   p7QualChart = new Chart($('p7-qual-chart'), {
-    type:'bar',
-    data:{
-      labels: qualRange.map(q => q % 20 === 0 ? q+'%' : ''),
-      datasets:[{
-        label:'ROI % at Current Investment',
+    type: 'bar',
+    data: {
+      labels: qualRange.map(q => q % 20 === 0 ? q + '%' : ''),
+      datasets: [{
+        label: 'ROI % at Current Investment',
         data: qualCurve,
         backgroundColor: qualColors,
-        borderRadius:2, borderSkipped:false,
+        borderRadius: 2, borderSkipped: false,
       }]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {display: false},
+        tooltip: {callbacks: {
           title: items => `Data Quality: ${qualRange[items[0].dataIndex]}%`,
-          label: c=>`ROI: ${c.raw.toFixed(1)}%`
+          label: c => `ROI: ${c.raw.toFixed(1)}%`
         }}
       },
-      scales:{
-        x:{ticks:{color:'#7488a8'},grid:{color:'rgba(31,45,74,.4)'},title:{display:true,text:'Data Quality (%)',color:'#7488a8',font:{size:11}}},
-        y:{ticks:{color:'#7488a8',callback:v=>v.toFixed(0)+'%'},grid:{color:'rgba(31,45,74,.4)'},title:{display:true,text:'ROI (%)',color:'#7488a8',font:{size:11}},min:0,max:200},
+      scales: {
+        x: {ticks: {color: '#7488a8'}, grid: {color: 'rgba(31,45,74,.4)'}, title: {display: true, text: 'Data Quality (%)', color: '#7488a8', font: {size: 11}}},
+        y: {ticks: {color: '#7488a8', callback: v => v.toFixed(0) + '%'}, grid: {color: 'rgba(31,45,74,.4)'}, title: {display: true, text: 'ROI (%)', color: '#7488a8', font: {size: 11}}, min: 0, max: 100},
       }
     }
   });
