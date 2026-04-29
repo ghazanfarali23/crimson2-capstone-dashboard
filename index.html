@@ -287,6 +287,17 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
     <span class="nbadge live">Live</span>
   </div>
 
+  <div class="sidebar-section-label">Extra Credit</div>
+
+  <div class="nav-item" data-target="ec1">
+    <div class="nav-icon">☁️</div>
+    <div class="nav-text">
+      <div class="nav-title">EC 1 · Cloud Cost Mgmt</div>
+      <div class="nav-sub">AWS Cost Explorer &amp; FinOps</div>
+    </div>
+    <span class="nbadge live">Live</span>
+  </div>
+
   <div class="sidebar-footer">
     Advanced Cloud Management · Spring 2026<br>
     Harvard Extension School<br>
@@ -1000,6 +1011,105 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
       </div>
     </section>
 
+    <!-- ════════════════════════════════════════════
+         EC 1 — Cloud Cost Management Panel (Aaron)
+         ════════════════════════════════════════════ -->
+    <section id="ec1" class="panel-section">
+
+      <!-- Context -->
+      <div class="card">
+        <div class="card-hd"><span class="ci">☁️</span> Cloud Cost Management Panel</div>
+        <p style="font-size:.79rem;color:var(--muted2);line-height:1.7">
+          Explore AWS spend with Cost Explorer — running in <span class="pill pill-blue">Demo Mode</span> with synthetic cost data.
+          Adjust the time range, grouping, and cost-reduction policy to simulate FinOps scenarios.
+        </p>
+      </div>
+
+      <div class="g2" style="align-items:start">
+
+        <!-- Controls (left) -->
+        <div>
+          <div class="card">
+            <div class="card-hd"><span class="ci">⚙️</span> Controls</div>
+
+            <div class="section-label">Time Range</div>
+            <div class="ig">
+              <label>Days of History: <strong id="ec1-days-val" style="color:var(--text)">90</strong></label>
+              <input type="range" id="ec1-days" min="7" max="365" step="1" value="90" oninput="renderEC1()">
+              <div class="slider-ticks"><span>7 d</span><span>186 d</span><span>365 d</span></div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="section-label">Granularity</div>
+            <div class="radio-row" style="margin-bottom:.6rem">
+              <div class="rbtn active" id="ec1-btn-daily" onclick="ec1SetGran('DAILY')">Daily</div>
+              <div class="rbtn" id="ec1-btn-monthly" onclick="ec1SetGran('MONTHLY')">Monthly</div>
+            </div>
+
+            <div class="section-label">Group By</div>
+            <div class="ig">
+              <select id="ec1-groupby" onchange="renderEC1()">
+                <option value="Service" selected>Service</option>
+                <option value="Region">Region</option>
+                <option value="Linked Account">Linked Account</option>
+              </select>
+            </div>
+
+            <div class="ig">
+              <label>Top N Groups: <strong id="ec1-topn-val" style="color:var(--text)">8</strong></label>
+              <input type="range" id="ec1-topn" min="3" max="15" step="1" value="8" oninput="renderEC1()">
+              <div class="slider-ticks"><span>3</span><span>9</span><span>15</span></div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="section-label">FinOps Policy Simulation</div>
+            <div class="ig">
+              <label>Cost Reduction (%): <strong id="ec1-red-val" style="color:var(--text)">0%</strong></label>
+              <input type="range" id="ec1-reduction" min="0" max="30" step="1" value="0" oninput="renderEC1()">
+              <div class="slider-ticks"><span>0%</span><span>15%</span><span>30%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI cards + insights (right) -->
+        <div>
+          <div class="g3" style="margin-bottom:.85rem">
+            <div class="mc"><div class="ml">MoM Change</div><div class="mv" id="ec1-m-mom">—</div><div class="ms" id="ec1-m-mom-sub">Last vs prior month</div></div>
+            <div class="mc"><div class="ml">Top-3 Concentration</div><div class="mv" id="ec1-m-conc">—</div><div class="ms">Share of total spend</div></div>
+            <div class="mc"><div class="ml">Projected Savings</div><div class="mv" id="ec1-m-save">—</div><div class="ms" id="ec1-m-save-sub">Period savings</div></div>
+          </div>
+
+          <!-- Anomaly box -->
+          <div id="ec1-anomaly-box" class="abox info" style="margin-bottom:.85rem"></div>
+
+          <!-- Spend by group chart -->
+          <div class="card">
+            <div class="card-hd"><span class="ci">📊</span> Spend by <span id="ec1-group-label">Service</span> (<span id="ec1-gran-label">daily</span>)</div>
+            <div class="cw" style="height:300px"><canvas id="ec1-spend-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total spend vs projected chart -->
+      <div class="card">
+        <div class="card-hd"><span class="ci">📈</span> Total Spend vs Projected (Policy Simulation)
+          <span style="color:var(--muted);font-weight:400;font-size:.7rem" id="ec1-policy-note">&nbsp;— 0% reduction applied</span>
+        </div>
+        <div class="cw" style="height:260px"><canvas id="ec1-total-chart"></canvas></div>
+      </div>
+
+      <!-- Anomaly table -->
+      <div class="card">
+        <div class="card-hd"><span class="ci">⚠️</span> Anomaly Detection — Days Exceeding Mean + 2× Std Dev</div>
+        <div style="max-height:220px;overflow-y:auto">
+          <table class="tbl" id="ec1-anomaly-tbl">
+            <thead><tr><th>Date</th><th>Amount (USD)</th><th>Z-Score</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </div><!-- /panel-area -->
 </div><!-- /main -->
 </div><!-- /app -->
@@ -1018,6 +1128,7 @@ const PANEL_META = {
   p6:{title:'Performance & Resilience Design',sub:'Uptime vs. Cost Trade-Off Simulator · Panel 6',label:'Panel 6'},
   p7:{title:'Innovation & AI Integration — ROI Sensitivity Explorer',sub:'AI Investment vs. Data Quality · Panel 7 · Week 11',label:'Panel 7'},
   p8:{title:'Adoption Curve — Training & Change Management',sub:'Employee Adoption Rate & Resistance Index · Panel 8 · Week 12',label:'Panel 8'},
+  ec1:{title:'Cloud Cost Management Panel',sub:'AWS Cost Explorer & FinOps Insights · Extra Credit 1',label:'EC 1'},
 };
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -1037,6 +1148,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     if (tgt === 'p6') renderP6();
     if (tgt === 'p7') renderP7();
     if (tgt === 'p8') renderP8();
+    if (tgt === 'ec1') renderEC1();
     if (tgt === 'p2') renderP2();
   });
 });
@@ -1820,6 +1932,246 @@ function renderP8() {
   tbody.innerHTML = data.map(d =>
     `<tr><td class="mono">${d.month}</td><td class="mono">${d.adoption.toFixed(2)}%</td><td class="mono">${d.resistance.toFixed(2)}</td></tr>`
   ).join('');
+}
+
+// ── EC 1 — Cloud Cost Management Panel (Aaron) ───────────────────
+let ec1SpendChart = null, ec1TotalChart = null, ec1Gran = 'DAILY';
+
+// Seeded PRNG (mulberry32) to match Python random.seed(42)
+function ec1Rng(seed) {
+  let s = seed | 0;
+  return function() {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function ec1Gauss(rng, mu, sigma) {
+  let u, v, s;
+  do { u = rng() * 2 - 1; v = rng() * 2 - 1; s = u * u + v * v; } while (s >= 1 || s === 0);
+  return mu + sigma * u * Math.sqrt(-2 * Math.log(s) / s);
+}
+
+const EC1_SERVICES = ['Amazon EC2','Amazon S3','Amazon RDS','AWS Lambda','Amazon CloudWatch','Amazon VPC','Amazon ElastiCache','Other'];
+const EC1_REGIONS = ['us-east-1','us-west-2','eu-west-1','ap-southeast-1','global'];
+const EC1_COLORS = [
+  'rgba(79,123,255,.85)','rgba(39,167,106,.85)','rgba(165,28,48,.85)','rgba(240,169,48,.85)',
+  'rgba(156,39,176,.85)','rgba(0,188,212,.85)','rgba(255,87,34,.85)','rgba(121,134,203,.85)',
+  'rgba(255,183,77,.85)','rgba(77,182,172,.85)','rgba(229,115,115,.85)','rgba(149,117,205,.85)',
+  'rgba(220,231,117,.85)','rgba(255,138,101,.85)','rgba(128,203,196,.85)',
+];
+
+function ec1GenerateData(daysBack, gran, groupBy, topN) {
+  const rng = ec1Rng(42);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(today); start.setDate(start.getDate() - daysBack + 1);
+
+  let names;
+  if (groupBy === 'Region') names = EC1_REGIONS.slice(0, Math.max(3, Math.min(topN, 5)));
+  else if (groupBy === 'Linked Account') names = Array.from({length: Math.max(3, Math.min(topN, 8))}, (_, i) => `Account-${1000 + i}`);
+  else names = EC1_SERVICES.slice(0, Math.max(3, Math.min(topN, EC1_SERVICES.length)));
+
+  const base = {};
+  names.forEach(n => { base[n] = 20 + rng() * 100; });
+
+  const dates = [];
+  if (gran === 'MONTHLY') {
+    const d = new Date(start.getFullYear(), start.getMonth(), 1);
+    while (d <= today) { dates.push(new Date(d)); d.setMonth(d.getMonth() + 1); }
+  } else {
+    const d = new Date(start);
+    while (d <= today) { dates.push(new Date(d)); d.setDate(d.getDate() + 1); }
+  }
+
+  const rows = [];
+  const totalLen = dates.length;
+  const spikeDay = Math.floor(totalLen / 3);
+  dates.forEach((dt, i) => {
+    const t = i / Math.max(totalLen, 1);
+    names.forEach(n => {
+      const noise = ec1Gauss(rng, 0, 8);
+      const trend = 1.0 + 0.15 * t;
+      const seasonal = 1.0 + 0.08 * (i % 7) / 7.0;
+      const spike = (gran === 'DAILY' && i === spikeDay) ? 35 : 0;
+      const amt = Math.max(0, base[n] * trend * seasonal + noise + spike);
+      rows.push({date: new Date(dt), group: n, amount: +amt.toFixed(4)});
+    });
+  });
+
+  // Keep only top N by total spend
+  const totals = {};
+  rows.forEach(r => { totals[r.group] = (totals[r.group] || 0) + r.amount; });
+  const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, topN);
+  const keep = new Set(sorted.map(e => e[0]));
+  return rows.filter(r => keep.has(r.group));
+}
+
+function ec1DailyTotals(rows) {
+  const map = {};
+  rows.forEach(r => {
+    const key = r.date.toISOString().slice(0, 10);
+    map[key] = (map[key] || 0) + r.amount;
+  });
+  return Object.entries(map).sort().map(([d, a]) => ({date: d, amount: a}));
+}
+
+function ec1MoM(daily) {
+  if (daily.length < 2) return null;
+  const months = {};
+  daily.forEach(d => { const ym = d.date.slice(0, 7); months[ym] = (months[ym] || 0) + d.amount; });
+  const keys = Object.keys(months).sort();
+  if (keys.length < 2) return null;
+  const last = months[keys[keys.length - 1]];
+  const prev = months[keys[keys.length - 2]];
+  if (prev === 0) return null;
+  return ((last - prev) / Math.abs(prev)) * 100;
+}
+
+function ec1TopConc(rows, n) {
+  const totals = {};
+  rows.forEach(r => { totals[r.group] = (totals[r.group] || 0) + r.amount; });
+  const sorted = Object.values(totals).sort((a, b) => b - a);
+  const total = sorted.reduce((a, b) => a + b, 0);
+  if (total === 0) return null;
+  return (sorted.slice(0, n).reduce((a, b) => a + b, 0) / total) * 100;
+}
+
+function ec1Anomalies(daily) {
+  if (daily.length < 3) return [];
+  const amounts = daily.map(d => d.amount);
+  const mu = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+  const sigma = Math.sqrt(amounts.reduce((a, v) => a + (v - mu) ** 2, 0) / amounts.length);
+  if (sigma === 0) return [];
+  return daily.map(d => {
+    const z = (d.amount - mu) / sigma;
+    return {...d, z, anomaly: z > 2.0};
+  }).filter(d => d.anomaly);
+}
+
+function ec1SetGran(g) {
+  ec1Gran = g;
+  $('ec1-btn-daily').classList.toggle('active', g === 'DAILY');
+  $('ec1-btn-monthly').classList.toggle('active', g === 'MONTHLY');
+  renderEC1();
+}
+
+function renderEC1() {
+  const days = parseInt($('ec1-days').value);
+  const groupBy = $('ec1-groupby').value;
+  const topN = parseInt($('ec1-topn').value);
+  const reduction = parseInt($('ec1-reduction').value);
+
+  $('ec1-days-val').textContent = days;
+  $('ec1-topn-val').textContent = topN;
+  $('ec1-red-val').textContent = reduction + '%';
+  $('ec1-group-label').textContent = groupBy;
+  $('ec1-gran-label').textContent = ec1Gran.toLowerCase();
+  $('ec1-policy-note').textContent = reduction > 0 ? ` — ${reduction}% reduction applied` : ' — no reduction applied';
+
+  const rows = ec1GenerateData(days, ec1Gran, groupBy, topN);
+  const daily = ec1DailyTotals(rows);
+
+  // KPIs
+  const mom = ec1MoM(daily);
+  const momEl = $('ec1-m-mom');
+  if (mom !== null) {
+    momEl.textContent = (mom >= 0 ? '+' : '') + mom.toFixed(1) + '%';
+    momEl.style.color = mom > 5 ? 'var(--red)' : mom < -5 ? 'var(--green)' : 'var(--text)';
+  } else { momEl.textContent = 'N/A'; momEl.style.color = ''; }
+
+  const conc = ec1TopConc(rows, 3);
+  $('ec1-m-conc').textContent = conc !== null ? conc.toFixed(1) + '%' : 'N/A';
+
+  const totalSpend = daily.reduce((a, d) => a + d.amount, 0);
+  const saved = totalSpend * (reduction / 100);
+  $('ec1-m-save').textContent = '$' + Math.round(saved).toLocaleString();
+  $('ec1-m-save-sub').textContent = `${reduction}% × $${Math.round(totalSpend).toLocaleString()}`;
+
+  // Anomalies
+  const anomalies = ec1Anomalies(daily);
+  const ab = $('ec1-anomaly-box');
+  if (anomalies.length === 0) {
+    ab.className = 'abox good';
+    ab.innerHTML = '<strong>✅ No Anomalies Detected</strong>No high spikes flagged — daily totals stayed within mean + 2× standard deviation.';
+  } else {
+    ab.className = 'abox warn';
+    ab.innerHTML = `<strong>⚠️ ${anomalies.length} Anomal${anomalies.length === 1 ? 'y' : 'ies'} Detected</strong>${anomalies.length} day${anomalies.length === 1 ? '' : 's'} exceeded mean + 2× std dev threshold. See table below for details.`;
+  }
+
+  const atbody = $('ec1-anomaly-tbl').querySelector('tbody');
+  if (anomalies.length === 0) {
+    atbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1rem">No anomalies detected</td></tr>';
+  } else {
+    atbody.innerHTML = anomalies.map(d =>
+      `<tr><td class="mono">${d.date}</td><td class="mono">$${d.amount.toFixed(2)}</td><td class="mono">${d.z.toFixed(2)}</td><td><span class="pill pill-red">Spike</span></td></tr>`
+    ).join('');
+  }
+
+  // Spend by group chart
+  const groups = [...new Set(rows.map(r => r.group))];
+  const dateKeys = [...new Set(rows.map(r => r.date.toISOString().slice(0, 10)))].sort();
+  const datasets = groups.map((g, gi) => {
+    const map = {};
+    rows.filter(r => r.group === g).forEach(r => { map[r.date.toISOString().slice(0, 10)] = r.amount; });
+    return {
+      label: g,
+      data: dateKeys.map(d => +(map[d] || 0).toFixed(2)),
+      borderColor: EC1_COLORS[gi % EC1_COLORS.length],
+      backgroundColor: 'transparent',
+      borderWidth: 2, tension: 0.3, pointRadius: 0, pointHoverRadius: 4,
+    };
+  });
+
+  const chartLabels = dateKeys.map(d => {
+    if (ec1Gran === 'MONTHLY') return d.slice(0, 7);
+    return dateKeys.length > 60 ? '' : d.slice(5);
+  });
+
+  if (ec1SpendChart) ec1SpendChart.destroy();
+  ec1SpendChart = new Chart($('ec1-spend-chart'), {
+    type: 'line',
+    data: {labels: chartLabels, datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {legend: {position: 'top', labels: {color: '#7488a8', font: {size: 10}, boxWidth: 10}}},
+      scales: {
+        x: {ticks: {color: '#7488a8', maxRotation: 0, autoSkip: true, maxTicksLimit: 12}, grid: {color: 'rgba(31,45,74,.5)'}},
+        y: {ticks: {color: '#7488a8', callback: v => '$' + v.toFixed(0)}, grid: {color: 'rgba(31,45,74,.5)'}, title: {display: true, text: 'USD', color: '#7488a8', font: {size: 11}}},
+      },
+      interaction: {mode: 'index', intersect: false},
+    }
+  });
+
+  // Total spend vs projected chart
+  const actualData = daily.map(d => +d.amount.toFixed(2));
+  const projData = daily.map(d => +(d.amount * (1 - reduction / 100)).toFixed(2));
+  const totalLabels = daily.map(d => {
+    if (ec1Gran === 'MONTHLY') return d.date.slice(0, 7);
+    return daily.length > 60 ? '' : d.date.slice(5);
+  });
+
+  if (ec1TotalChart) ec1TotalChart.destroy();
+  ec1TotalChart = new Chart($('ec1-total-chart'), {
+    type: 'line',
+    data: {
+      labels: totalLabels,
+      datasets: [
+        {label: 'Actual Total (USD)', data: actualData, borderColor: 'rgba(79,123,255,1)', backgroundColor: 'rgba(79,123,255,.08)', borderWidth: 2.5, tension: 0.3, pointRadius: 0, fill: true},
+        {label: 'Projected After Policy (USD)', data: projData, borderColor: 'rgba(39,167,106,1)', backgroundColor: 'rgba(39,167,106,.08)', borderWidth: 2, borderDash: [6, 4], tension: 0.3, pointRadius: 0, fill: true},
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {legend: {position: 'top', labels: {color: '#7488a8', font: {size: 11}, boxWidth: 12}}},
+      scales: {
+        x: {ticks: {color: '#7488a8', maxRotation: 0, autoSkip: true, maxTicksLimit: 12}, grid: {color: 'rgba(31,45,74,.5)'}},
+        y: {ticks: {color: '#7488a8', callback: v => '$' + v.toFixed(0)}, grid: {color: 'rgba(31,45,74,.5)'}, title: {display: true, text: 'USD', color: '#7488a8', font: {size: 11}}},
+      },
+      interaction: {mode: 'index', intersect: false},
+    }
+  });
 }
 
 // ── Init on load ───────────────────────────────────────────────────
