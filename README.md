@@ -9,11 +9,11 @@
 
 ## About
 
-This dashboard is our **capstone deliverable**, combining all 8 weekly panels plus extra credit into a single interactive web app. Each panel corresponds to a week of the capstone and addresses a different dimension of the MedData cloud migration to AWS.
+This dashboard is our **capstone deliverable**, combining all 9 weekly panels plus extra credit into a single interactive web app. Each panel corresponds to a week of the capstone and addresses a different dimension of the MedData cloud migration to AWS.
 
 ---
 
-## The 8 Panels
+## The 9 Panels
 
 | Panel | Week | Topic | Key Result |
 |-------|------|--------|------------|
@@ -25,6 +25,7 @@ This dashboard is our **capstone deliverable**, combining all 8 weekly panels pl
 | **6** | Week 10 | Performance & Resilience Design | Non-linear cost curve · optimal redundancy = Level 4 (99.95% uptime) |
 | **7** | Week 11 | Innovation & AI Integration | ROI plateaus after $300K investment · 80% data quality = max gain |
 | **8** | Week 12 | Adoption Curve & Change Management | Logistic S-curve adoption · resistance decay · training + leadership drivers |
+| **9** | Week 13 | Product Diffusion & Market Strategy | S-curve customer adoption · B2B/B2C · marketing spend + network effects |
 
 ### Extra Credit
 
