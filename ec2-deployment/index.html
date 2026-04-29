@@ -1357,41 +1357,15 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
       </div>
 
       <div class="card">
-        <div class="card-hd"><span class="ci">🔗</span> Live Deployment Links (Extra Credit 2)</div>
-        <table class="tbl" style="font-size:.78rem">
-          <tbody>
-            <tr>
-              <td style="width:30%"><strong style="color:var(--text)">Primary (Amplify)</strong></td>
-              <td>
-                <a href="https://YOUR_AMPLIFY_DOMAIN.amplifyapp.com" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">
-                  https://YOUR_AMPLIFY_DOMAIN.amplifyapp.com
-                </a>
-                <span class="pill pill-amber" style="margin-left:.5rem">Update me</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong style="color:var(--text)">EC2 Deployment</strong></td>
-              <td>
-                <a href="http://YOUR_ELASTIC_IP" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">
-                  http://YOUR_ELASTIC_IP
-                </a>
-                <span class="pill pill-amber" style="margin-left:.5rem">Update me</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong style="color:var(--text)">EC2 Repo</strong></td>
-              <td>
-                <a href="https://github.com/YOUR_USERNAME/crimson2-ec2-deployment" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">
-                  https://github.com/YOUR_USERNAME/crimson2-ec2-deployment
-                </a>
-                <span class="pill pill-amber" style="margin-left:.5rem">Update me</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;line-height:1.6">
-          Replace the placeholders above with your actual Amplify domain, Elastic IP, and GitHub username after deployment.
-          The EC2 instance runs <strong>Amazon Linux 2023 + nginx</strong> and is deployed via the separate repo linked above.
+        <div class="card-hd"><span class="ci">📎</span> EC2 lab / instance deliverable (course materials)</div>
+        <p style="font-size:.78rem;color:var(--muted2);line-height:1.75">
+	  If your instructor requires a separate EC2-based artifact (e.g. WordPress or custom AMI), add links or screenshots here after deployment — for example:
+        </p>
+        <p style="font-size:.78rem;margin-top:.5rem">
+          <span class="pill pill-amber">Placeholder</span>
+          <strong style="color:var(--text)">EC2 instance public DNS / Elastic IP:</strong>
+          <span class="mono" style="color:var(--muted)">https://ec2-XX-XX-XX-XX.compute-1.amazonaws.com</span>
+	  — replace with your live URL or state “submitted via learning portal only.”
         </p>
       </div>
     </section>
@@ -2608,9 +2582,15 @@ window.addEventListener('load', () => {
  * CLIENT_ID:      App integration → App clients → Client ID (no secret for SPA)
  * REGION:         AWS region hosting the pool (must match pool ID prefix)
  */
-const COGNITO_USER_POOL_ID = '';
-const COGNITO_USER_POOL_CLIENT_ID = '';
-const COGNITO_REGION = 'us-east-1';
+/* ═══════════════════════════════════════════════════════
+   COGNITO CONFIGURATION — EXTRA CREDIT 2
+   Replace the placeholders below with your live values
+   from AWS Cognito → User pools → Pool details / App clients.
+   These are public identifiers; do NOT add secrets or IAM keys.
+   ═══════════════════════════════════════════════════════ */
+const COGNITO_USER_POOL_ID        = 'us-east-1_XXXXXXXXX'; // ← YOUR POOL ID
+const COGNITO_USER_POOL_CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // ← YOUR CLIENT ID
+const COGNITO_REGION              = 'us-east-1';           // ← YOUR REGION
 
 import { Amplify } from 'https://esm.sh/aws-amplify@6.14.0';
 import {
