@@ -9,11 +9,11 @@
 
 ## About
 
-This dashboard is our **midterm deliverable**, combining all 7 weekly panels into a single interactive web app. Each panel corresponds to a week of the capstone and addresses a different dimension of the MedData cloud migration to AWS.
+This dashboard is our **capstone deliverable**, combining all 8 weekly panels into a single interactive web app. Each panel corresponds to a week of the capstone and addresses a different dimension of the MedData cloud migration to AWS.
 
 ---
 
-## The 7 Panels
+## The 8 Panels
 
 | Panel | Week | Topic | Key Result |
 |-------|------|--------|------------|
@@ -24,6 +24,7 @@ This dashboard is our **midterm deliverable**, combining all 7 weekly panels int
 | **5** | Week 9 | Implementation Roadmap & DevOps | Automation >70% → +50% deploy frequency, −40% failure rate |
 | **6** | Week 10 | Performance & Resilience Design | Non-linear cost curve · optimal redundancy = Level 4 (99.95% uptime) |
 | **7** | Week 11 | Innovation & AI Integration | ROI plateaus after $300K investment · 80% data quality = max gain |
+| **8** | Week 12 | Adoption Curve & Change Management | Logistic S-curve adoption · resistance decay · training + leadership drivers |
 
 ---
 
