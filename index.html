@@ -200,9 +200,101 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+/* ── Auth overlay (Cognito / Amplify) ─────────────────────────────── */
+#app:not(.authed){display:none!important}
+#auth-overlay{
+  position:fixed;inset:0;z-index:10000;
+  background:linear-gradient(165deg,var(--navy) 0%,#060a14 50%,var(--navy) 100%);
+  display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;
+}
+#auth-overlay.hidden{display:none!important}
+.auth-shell{width:100%;max-width:440px}
+.auth-brand{text-align:center;margin-bottom:1.25rem}
+.auth-brand .logo-pill{margin-bottom:.5rem}
+.auth-brand h1{font-size:1.05rem;font-weight:700;color:var(--text)}
+.auth-brand p{font-size:.72rem;color:var(--muted);margin-top:.35rem;line-height:1.5}
+.auth-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:13px;
+  padding:1.2rem 1.15rem 1.35rem;box-shadow:0 28px 90px rgba(0,0,0,.5);
+}
+.auth-tabs{display:flex;gap:.45rem;margin-bottom:1rem;flex-wrap:wrap}
+.auth-tabs .tab{
+  flex:1;min-width:0;text-align:center;padding:.38rem .5rem;border-radius:8px;
+  font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);
+  color:var(--muted);background:transparent;transition:all .18s;font-family:inherit;
+}
+.auth-tabs .tab:hover{border-color:rgba(165,28,48,.45);color:var(--text)}
+.auth-tabs .tab.active{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.auth-pane{display:none}
+.auth-pane.active{display:block}
+.auth-msg{
+  font-size:.75rem;padding:.55rem .7rem;border-radius:8px;margin-bottom:.85rem;line-height:1.45;
+}
+.auth-msg.err{background:rgba(229,64,64,.12);border:1px solid rgba(229,64,64,.35);color:#f09090}
+.auth-msg.ok{background:rgba(39,167,106,.12);border:1px solid rgba(39,167,106,.35);color:#5cd4a0}
+.auth-msg.hint{background:rgba(79,123,255,.1);border:1px solid rgba(79,123,255,.3);color:var(--muted2)}
+.auth-foot{margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border);font-size:.65rem;color:var(--muted);line-height:1.55}
+#auth-logout-btn{
+  margin-top:.65rem;width:100%;padding:.45rem .8rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--panel2);color:var(--text);font-size:.72rem;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:border-color .18s,background .18s;
+}
+#auth-logout-btn:hover{border-color:var(--crimson);background:rgba(165,28,48,.12)}
 </style>
 </head>
 <body>
+<!-- ═══════════ AUTH (AWS Cognito via Amplify) ═══════════ -->
+<div id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+  <div class="auth-shell">
+    <div class="auth-brand">
+      <div class="logo-pill">🎓 Harvard</div>
+      <h1 id="auth-title">Cloud Capstone Dashboard</h1>
+      <p>Sign in with your course Cognito user to access the MedData migration simulator.</p>
+    </div>
+    <div class="auth-card">
+      <div id="auth-config-msg" class="auth-msg hint" style="display:none"></div>
+      <div id="auth-flash" class="auth-msg" style="display:none"></div>
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="tab active" data-auth-tab="signin" role="tab" aria-selected="true">Sign in</button>
+        <button type="button" class="tab" data-auth-tab="signup" role="tab" aria-selected="false">Sign up</button>
+        <button type="button" class="tab" data-auth-tab="forgot" role="tab" aria-selected="false">Forgot password</button>
+      </div>
+      <div id="auth-pane-signin" class="auth-pane active" role="tabpanel">
+        <div class="ig"><label>Email</label><input type="email" id="auth-in-email" autocomplete="username"></div>
+        <div class="ig"><label>Password</label><input type="password" id="auth-in-pass" autocomplete="current-password"></div>
+        <button type="button" class="rbtn active" id="auth-btn-signin" style="width:100%;text-align:center;margin-top:.4rem;padding:.5rem;border-radius:8px;border:none">Sign in</button>
+      </div>
+      <div id="auth-pane-signup" class="auth-pane" role="tabpanel">
+        <div class="ig"><label>Email</label><input type="email" id="auth-up-email" autocomplete="email"></div>
+        <div class="ig"><label>Password</label><input type="password" id="auth-up-pass" autocomplete="new-password"></div>
+        <div class="ig"><label>Confirm password</label><input type="password" id="auth-up-pass2" autocomplete="new-password"></div>
+        <button type="button" class="rbtn active" id="auth-btn-signup" style="width:100%;text-align:center;margin-top:.4rem;padding:.5rem;border-radius:8px;border:none">Create account</button>
+      </div>
+      <div id="auth-pane-signup-confirm" style="display:none">
+        <p style="font-size:.74rem;color:var(--muted2);margin-bottom:.75rem;line-height:1.55">Enter the verification code sent to your email.</p>
+        <div class="ig"><label>Confirmation code</label><input type="text" id="auth-up-code" autocomplete="one-time-code"></div>
+        <button type="button" class="rbtn active" id="auth-btn-confirm" style="width:100%;text-align:center;margin-top:.4rem;padding:.5rem;border-radius:8px;border:none">Verify email</button>
+      </div>
+      <div id="auth-pane-forgot" class="auth-pane" role="tabpanel">
+        <div id="auth-forgot-step1">
+          <div class="ig"><label>Email</label><input type="email" id="auth-fp-email" autocomplete="username"></div>
+          <button type="button" class="rbtn active" id="auth-btn-fp-request" style="width:100%;text-align:center;margin-top:.4rem;padding:.5rem;border-radius:8px;border:none">Send reset code</button>
+        </div>
+        <div id="auth-forgot-step2" style="display:none">
+          <div class="ig"><label>Verification code</label><input type="text" id="auth-fp-code" autocomplete="one-time-code"></div>
+          <div class="ig"><label>New password</label><input type="password" id="auth-fp-new1" autocomplete="new-password"></div>
+          <div class="ig"><label>Confirm new password</label><input type="password" id="auth-fp-new2" autocomplete="new-password"></div>
+          <button type="button" class="rbtn active" id="auth-btn-fp-submit" style="width:100%;text-align:center;margin-top:.4rem;padding:.5rem;border-radius:8px;border:none">Set new password</button>
+        </div>
+      </div>
+      <div class="auth-foot">
+        Session tokens are issued by Amazon Cognito (JWT). This page uses TLS when hosted on Amplify; do not deploy real pool credentials to a public repository.
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="app">
 
 <!-- ═══════════ SIDEBAR ═══════════ -->
@@ -307,10 +399,20 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
     <span class="nbadge live">Live</span>
   </div>
 
+  <div class="nav-item" data-target="ec2">
+    <div class="nav-icon">🚀</div>
+    <div class="nav-text">
+      <div class="nav-title">EC 2 · Deployment &amp; Ops</div>
+      <div class="nav-sub">Amplify, Cognito, cost &amp; security</div>
+    </div>
+    <span class="nbadge live">Live</span>
+  </div>
+
   <div class="sidebar-footer">
     Advanced Cloud Management · Spring 2026<br>
     Harvard Extension School<br>
     <span style="color:#e8637a;font-weight:700">Group Crimson 2</span> &nbsp;·&nbsp; Ghazanfar &nbsp;·&nbsp; Aaron &nbsp;·&nbsp; Chloe
+    <button type="button" id="auth-logout-btn" style="display:none">Sign out</button>
   </div>
 </aside>
 
@@ -1187,6 +1289,87 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
       </div>
     </section>
 
+    <!-- ════════════════════════════════════════════
+         EC 2 — End-to-End Cloud Product Deployment
+         ════════════════════════════════════════════ -->
+    <section id="ec2" class="panel-section">
+      <div class="card">
+        <div class="card-hd"><span class="ci">🚀</span> Extra Credit 2 — End-to-End Cloud Product Deployment</div>
+        <p style="font-size:.79rem;color:var(--muted2);line-height:1.75">
+	  This panel documents how the capstone dashboard is delivered as a cloud product: static hosting on <strong style="color:var(--text)">AWS Amplify</strong>,
+	  user authentication with <strong style="color:var(--text)">Amazon Cognito</strong>, and the supporting AWS edge and storage services that keep the app fast and secure.
+        </p>
+      </div>
+
+      <div class="g2" style="align-items:start">
+        <div class="card">
+          <div class="card-hd"><span class="ci">☁️</span> (1) AWS services in the stack</div>
+          <ul style="font-size:.78rem;color:var(--muted2);line-height:1.75;margin-left:1.1rem">
+            <li><strong style="color:var(--text)">Amazon Cognito User Pool</strong> — sign-up, sign-in, password recovery; issues JWT access / ID tokens for the browser.</li>
+            <li><strong style="color:var(--text)">AWS Amplify Hosting</strong> — CI/CD from Git, HTTPS, global distribution via CloudFront with S3 origin behind the scenes.</li>
+            <li><strong style="color:var(--text)">Amazon S3</strong> — stores static objects (HTML, CSS, JS) for each deployment; not accessed directly by end users when served through Amplify.</li>
+            <li><strong style="color:var(--text)">Amazon CloudFront</strong> — CDN caching and TLS termination at the edge (provided as part of Amplify Hosting).</li>
+            <li><strong style="color:var(--text)">AWS Amplify JS (CDN)</strong> — browser client configured with only the <em>public</em> User Pool ID and app client ID (no client secret in SPA flows).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="ci">💵</span> (2) Estimated monthly cost</div>
+          <table class="tbl">
+            <thead><tr><th>Item</th><th>Free tier / notes</th><th>Rough scale</th></tr></thead>
+            <tbody>
+              <tr><td>Cognito MAUs</td><td>First 50k MAUs / month free (see current pricing)</td><td>Often $0 for class demos</td></tr>
+              <tr><td>Amplify Hosting</td><td>Build minutes + hosting GB-mo; small static sites often remain low</td><td>~$0–5/mo light traffic</td></tr>
+              <tr><td>S3 + CloudFront</td><td>Bundled into Amplify hosting charges; pay for egress beyond free tiers</td><td>Low until traffic spikes</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;line-height:1.6">
+	    Figures are <strong>order-of-magnitude</strong> only; use the <a href="https://calculator.aws/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">AWS Pricing Calculator</a> and your own usage reports for commitments.
+          </p>
+        </div>
+      </div>
+
+      <div class="g2" style="align-items:start">
+        <div class="card">
+          <div class="card-hd"><span class="ci">🔐</span> (3) Security assumptions</div>
+          <ul style="font-size:.78rem;color:var(--muted2);line-height:1.75;margin-left:1.1rem">
+            <li>HTTPS only in production (Amplify default); protects tokens and credentials in transit.</li>
+            <li>Cognito validates passwords and MFA if enabled; the SPA stores session state via Amplify, not custom cookies with secrets.</li>
+            <li>JWTs are validated by AWS for API calls; this dashboard is static-only, so tokens are mainly for gating access and future API integration.</li>
+            <li><strong style="color:var(--text)">No secrets in Git</strong> — only public IDs in <code class="mono" style="color:var(--accent)">index.html</code>; never commit OAuth client secrets or IAM keys.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="ci">🛑</span> (4) Shutdown &amp; budget limiting</div>
+          <ul style="font-size:.78rem;color:var(--muted2);line-height:1.75;margin-left:1.1rem">
+            <li><strong style="color:var(--text)">AWS Budgets + billing alarms</strong> — email/SNS when forecasted or actual spend crosses a threshold (e.g. $5).</li>
+            <li><strong style="color:var(--text)">Disable Amplify app</strong> — stops builds and hosting charges for the frontend.</li>
+            <li><strong style="color:var(--text)">Delete Cognito user pool</strong> — removes auth and MAU metering after the course demo.</li>
+            <li>Review <strong>Cost Explorer</strong> and <strong>Free Tier</strong> usage monthly during the project.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="ci">🗺️</span> Reference architecture (high level)</div>
+        <div class="mermaid-wrap" id="ec2-mermaid-wrap">
+          <div id="ec2-mermaid-out" style="min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.8rem">Loading diagram…</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="ci">📎</span> EC2 lab / instance deliverable (course materials)</div>
+        <p style="font-size:.78rem;color:var(--muted2);line-height:1.75">
+	  If your instructor requires a separate EC2-based artifact (e.g. WordPress or custom AMI), add links or screenshots here after deployment — for example:
+        </p>
+        <p style="font-size:.78rem;margin-top:.5rem">
+          <span class="pill pill-amber">Placeholder</span>
+          <strong style="color:var(--text)">EC2 instance public DNS / Elastic IP:</strong>
+          <span class="mono" style="color:var(--muted)">https://ec2-XX-XX-XX-XX.compute-1.amazonaws.com</span>
+	  — replace with your live URL or state “submitted via learning portal only.”
+        </p>
+      </div>
+    </section>
+
   </div><!-- /panel-area -->
 </div><!-- /main -->
 </div><!-- /app -->
@@ -1207,6 +1390,7 @@ const PANEL_META = {
   p8:{title:'Adoption Curve — Training & Change Management',sub:'Employee Adoption Rate & Resistance Index · Panel 8 · Week 12',label:'Panel 8'},
   p9:{title:'Product Diffusion & Market Strategy',sub:'Customer Adoption S-Curve Simulator · Panel 9 · Week 13',label:'Panel 9'},
   ec1:{title:'Cloud Cost Management Panel',sub:'AWS Cost Explorer & FinOps Insights · Extra Credit 1',label:'EC 1'},
+  ec2:{title:'Deployment & Cloud Operations',sub:'Amplify Hosting · Cognito · Cost & security · Extra Credit 2',label:'EC 2'},
 };
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -1228,6 +1412,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     if (tgt === 'p8') renderP8();
     if (tgt === 'p9') renderP9();
     if (tgt === 'ec1') renderEC1();
+    if (tgt === 'ec2') initEC2();
     if (tgt === 'p2') renderP2();
   });
 });
@@ -1430,6 +1615,36 @@ document.querySelectorAll('#p2 input').forEach(el => el.addEventListener('input'
 // ── PANEL 3 — Mermaid org chart ────────────────────────────────────
 let p3Ready = false;
 mermaid.initialize({startOnLoad:false, theme:'dark'});
+
+let ec2Ready = false;
+async function initEC2() {
+  if (ec2Ready) return;
+  ec2Ready = true;
+  const def = `flowchart LR
+    subgraph Client["User browser"]
+      U[SPA dashboard]
+    end
+    subgraph Edge["AWS edge"]
+      CF[CloudFront CDN]
+    end
+    subgraph Host["Amplify Hosting"]
+      AMP[Build + deploy]
+      S3[(S3 static objects)]
+    end
+    subgraph IdP["Auth"]
+      COG[Amazon Cognito User Pool]
+    end
+    U -->|HTTPS| CF
+    CF --> S3
+    AMP --> S3
+    U -->|Sign in / JWT| COG`;
+  try {
+    const {svg} = await mermaid.render('mermaid-ec2-arch', def);
+    $('ec2-mermaid-out').innerHTML = svg;
+  } catch(e) {
+    $('ec2-mermaid-out').textContent = 'Architecture diagram unavailable in this environment.';
+  }
+}
 
 async function initP3() {
   if (p3Ready) return;
@@ -2357,6 +2572,305 @@ window.addEventListener('load', () => {
   renderP7();
   renderP8();
 });
+</script>
+
+<!-- AWS Amplify (Cognito) — ES module via CDN. Replace placeholders only after pool + app client exist. -->
+<script type="module">
+/**
+ * Cognito public identifiers — safe in Git; never add client secrets or IAM keys here.
+ * USER_POOL_ID:   Cognito console → User pool → Pool details → User pool ID (e.g. us-east-1_xxxx)
+ * CLIENT_ID:      App integration → App clients → Client ID (no secret for SPA)
+ * REGION:         AWS region hosting the pool (must match pool ID prefix)
+ */
+const COGNITO_USER_POOL_ID = '';
+const COGNITO_USER_POOL_CLIENT_ID = '';
+const COGNITO_REGION = 'us-east-1';
+
+import { Amplify } from 'https://esm.sh/aws-amplify@6.14.0';
+import {
+  signIn,
+  signUp,
+  signOut,
+  getCurrentUser,
+  confirmSignUp,
+  resetPassword,
+  confirmResetPassword,
+} from 'https://esm.sh/aws-amplify@6.14.0/auth';
+
+const el = id => document.getElementById(id);
+
+function cognitoConfigured() {
+  return !!(String(COGNITO_USER_POOL_ID || '').trim()
+    && String(COGNITO_USER_POOL_CLIENT_ID || '').trim()
+    && String(COGNITO_REGION || '').trim());
+}
+
+function flash(msg, kind) {
+  const box = el('auth-flash');
+  box.textContent = msg;
+  box.className = 'auth-msg ' + (kind || 'err');
+  box.style.display = msg ? 'block' : 'none';
+}
+
+function setAuthBusy(busy) {
+  ['auth-btn-signin','auth-btn-signup','auth-btn-confirm','auth-btn-fp-request','auth-btn-fp-submit'].forEach(id => {
+    const b = el(id);
+    if (b) b.disabled = busy;
+  });
+}
+
+function revealApp() {
+  el('app').classList.add('authed');
+  el('auth-overlay').classList.add('hidden');
+  el('auth-logout-btn').style.display = 'block';
+  flash('', '');
+  requestAnimationFrame(() => {
+    ['renderP1','renderP2','renderP4','renderP5','renderP6','renderP7','renderP8','renderP9','renderEC1'].forEach(fn => {
+      try {
+        if (typeof window[fn] === 'function') window[fn]();
+      } catch (_) { /* ignore */ }
+    });
+  });
+}
+
+async function tryResumeSession() {
+  if (!cognitoConfigured()) return;
+  try {
+    await getCurrentUser();
+    revealApp();
+  } catch (_) {
+    /* stay on sign-in */
+  }
+}
+
+let signupPendingUser = null;
+let forgotPendingEmail = null;
+
+function resetSignupFlow() {
+  signupPendingUser = null;
+  el('auth-pane-signup').style.display = '';
+  el('auth-pane-signup-confirm').style.display = 'none';
+  el('auth-up-code').value = '';
+}
+
+function showConfigGate() {
+  const m = el('auth-config-msg');
+  m.style.display = 'block';
+  m.textContent =
+    'Cognito is not configured for this deployment. Add your USER_POOL_ID and CLIENT_ID (and correct REGION) in the script block labeled “Cognito public identifiers” at the bottom of index.html, then redeploy. See README.md for step-by-step AWS Console setup.';
+  el('auth-overlay').querySelectorAll('input, button').forEach(node => { node.disabled = true; });
+}
+
+function bindTabs() {
+  el('auth-overlay').querySelectorAll('[data-auth-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!cognitoConfigured()) return;
+      const tab = btn.getAttribute('data-auth-tab');
+      el('auth-overlay').querySelectorAll('[data-auth-tab]').forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      el('auth-pane-signin').classList.toggle('active', tab === 'signin');
+      el('auth-pane-signup').classList.toggle('active', tab === 'signup');
+      el('auth-pane-forgot').classList.toggle('active', tab === 'forgot');
+      el('auth-pane-signin').style.display = tab === 'signin' ? '' : 'none';
+      el('auth-pane-signup').style.display = tab === 'signup' ? '' : 'none';
+      el('auth-pane-forgot').style.display = tab === 'forgot' ? '' : 'none';
+      if (tab === 'signup') resetSignupFlow();
+      if (tab === 'forgot') {
+        el('auth-forgot-step1').style.display = '';
+        el('auth-forgot-step2').style.display = 'none';
+        forgotPendingEmail = null;
+      }
+      flash('', '');
+    });
+  });
+}
+
+async function main() {
+  if (!cognitoConfigured()) {
+    showConfigGate();
+    return;
+  }
+
+  Amplify.configure({
+    Auth: {
+      Cognito: {
+        userPoolId: COGNITO_USER_POOL_ID.trim(),
+        userPoolClientId: COGNITO_USER_POOL_CLIENT_ID.trim(),
+      },
+    },
+  });
+
+  bindTabs();
+
+  el('auth-btn-signin').addEventListener('click', async () => {
+    flash('', '');
+    const username = el('auth-in-email').value.trim();
+    const password = el('auth-in-pass').value;
+    if (!username || !password) {
+      flash('Enter email and password.', 'err');
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      const out = await signIn({ username, password });
+      const step = out?.nextStep?.signInStep;
+      if (step === 'CONFIRM_SIGN_UP') {
+        flash('Confirm your email before signing in. Use the Sign up tab to request a new code if needed.', 'err');
+        return;
+      }
+      if (step && step !== 'DONE') {
+        flash('Additional sign-in steps are required in Cognito for this user.', 'err');
+        return;
+      }
+      revealApp();
+    } catch (e) {
+      flash(e?.message || 'Sign in failed.', 'err');
+    } finally {
+      setAuthBusy(false);
+    }
+  });
+
+  el('auth-btn-signup').addEventListener('click', async () => {
+    flash('', '');
+    const username = el('auth-up-email').value.trim();
+    const p1 = el('auth-up-pass').value;
+    const p2 = el('auth-up-pass2').value;
+    if (!username || !p1) {
+      flash('Enter email and password.', 'err');
+      return;
+    }
+    if (p1 !== p2) {
+      flash('Passwords do not match.', 'err');
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      const { nextStep } = await signUp({
+        username,
+        password: p1,
+        options: { userAttributes: { email: username } },
+      });
+      if (nextStep.signUpStep === 'CONFIRM_SIGN_UP') {
+        signupPendingUser = username;
+        el('auth-pane-signup').style.display = 'none';
+        el('auth-pane-signup-confirm').style.display = 'block';
+        flash('Check your email for the confirmation code.', 'ok');
+      } else if (nextStep.signUpStep === 'COMPLETE_AUTO_SIGN_IN') {
+        revealApp();
+      } else {
+        flash('Sign up requires an extra step in Cognito. Complete it in the console or adjust pool settings.', 'err');
+      }
+    } catch (e) {
+      flash(e?.message || 'Sign up failed.', 'err');
+    } finally {
+      setAuthBusy(false);
+    }
+  });
+
+  el('auth-btn-confirm').addEventListener('click', async () => {
+    if (!signupPendingUser) {
+      flash('Start sign up again to receive a code.', 'err');
+      return;
+    }
+    const code = el('auth-up-code').value.trim();
+    if (!code) {
+      flash('Enter the verification code.', 'err');
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      await confirmSignUp({ username: signupPendingUser, confirmationCode: code });
+      const signedUpAs = signupPendingUser;
+      flash('Email verified. You can sign in.', 'ok');
+      resetSignupFlow();
+      el('auth-overlay').querySelector('[data-auth-tab="signin"]').click();
+      el('auth-in-email').value = signedUpAs;
+    } catch (e) {
+      flash(e?.message || 'Verification failed.', 'err');
+    } finally {
+      setAuthBusy(false);
+    }
+  });
+
+  el('auth-btn-fp-request').addEventListener('click', async () => {
+    flash('', '');
+    const username = el('auth-fp-email').value.trim();
+    if (!username) {
+      flash('Enter your account email.', 'err');
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      await resetPassword({ username });
+      forgotPendingEmail = username;
+      el('auth-forgot-step1').style.display = 'none';
+      el('auth-forgot-step2').style.display = '';
+      flash('If an account exists, a confirmation code was sent to the registered email.', 'ok');
+    } catch (e) {
+      flash(e?.message || 'Could not start password reset.', 'err');
+    } finally {
+      setAuthBusy(false);
+    }
+  });
+
+  el('auth-btn-fp-submit').addEventListener('click', async () => {
+    const username = forgotPendingEmail || el('auth-fp-email').value.trim();
+    const confirmationCode = el('auth-fp-code').value.trim();
+    const newPassword = el('auth-fp-new1').value;
+    const again = el('auth-fp-new2').value;
+    if (!username || !confirmationCode || !newPassword) {
+      flash('Fill in code and new password.', 'err');
+      return;
+    }
+    if (newPassword !== again) {
+      flash('New passwords do not match.', 'err');
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      await confirmResetPassword({ username, confirmationCode, newPassword });
+      flash('Password updated. Sign in with the new password.', 'ok');
+      el('auth-forgot-step1').style.display = '';
+      el('auth-forgot-step2').style.display = 'none';
+      el('auth-overlay').querySelector('[data-auth-tab="signin"]').click();
+      el('auth-in-email').value = username;
+    } catch (e) {
+      flash(e?.message || 'Password reset failed.', 'err');
+    } finally {
+      setAuthBusy(false);
+    }
+  });
+
+  el('auth-logout-btn').addEventListener('click', async () => {
+    try {
+      await signOut({ global: true });
+    } catch (_) { /* ignore */ }
+    el('app').classList.remove('authed');
+    el('auth-overlay').classList.remove('hidden');
+    el('auth-logout-btn').style.display = 'none';
+    el('auth-in-pass').value = '';
+  });
+
+  el('auth-in-email').addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      el('auth-in-pass').focus();
+    }
+  });
+  el('auth-in-pass').addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      el('auth-btn-signin').click();
+    }
+  });
+
+  await tryResumeSession();
+}
+
+main();
 </script>
 </body>
 </html>
