@@ -863,8 +863,8 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
           <div class="card">
             <div class="card-hd"><span class="ci">⚙️</span> Inputs</div>
             <div class="ig">
-              <label>AI Investment ($): <strong id="p7-inv-val" style="color:var(--text)">$180,000</strong></label>
-              <input type="range" id="p7-inv" min="0" max="500000" step="5000" value="180000" oninput="renderP7()">
+              <label>AI Investment ($): <strong id="p7-inv-val" style="color:var(--text)">$150,000</strong></label>
+              <input type="range" id="p7-inv" min="0" max="200000" step="5000" value="150000" oninput="renderP7()">
               <div class="slider-ticks"><span>$0</span><span>$250K</span><span>$500K</span></div>
               <div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">Annual or program-level AI spend (models, tooling, integration).</div>
             </div>
@@ -886,7 +886,7 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
           <div class="g3" style="margin-bottom:.85rem">
             <div class="mc"><div class="ml">5-yr Net Gain</div><div class="mv" id="p7-m-net">—</div></div>
             <div class="mc"><div class="ml">Efficiency Score</div><div class="mv" id="p7-m-eff">—</div></div>
-            <div class="mc"><div class="ml">Optimal Invest.</div><div class="mv" id="p7-m-opt">$300K</div><div class="ms good">ROI plateau</div></div>
+            <div class="mc"><div class="ml">Optimal Invest.</div><div class="mv" id="p7-m-opt">$150K</div><div class="ms good">ROI plateau</div></div>
           </div>
 
           <!-- Zone Box -->
@@ -1735,8 +1735,8 @@ let p7MainChart = null, p7QualChart = null;
 // Investment saturates after ~$300K; data quality scales and caps ROI.
 const P7_I_SCALE = 135000;
 const P7_ROI_CEILING = 92.0;
-const P7_ZONE_UNDER = 120000;
-const P7_ZONE_OPTIMAL = 300000;
+const P7_ZONE_UNDER = 80000;
+const P7_ZONE_OPTIMAL = 150000;
 
 function calcAiROI(investment, dataQualityPct) {
   const inv = Math.max(0, investment);
@@ -1754,7 +1754,7 @@ const p7ZonePlugin = {
     const zones = [
       {x0: 0,              x1: P7_ZONE_UNDER,   color: 'rgba(239,68,68,0.14)',  label: 'Underinvestment'},
       {x0: P7_ZONE_UNDER,  x1: P7_ZONE_OPTIMAL, color: 'rgba(234,179,8,0.17)',  label: 'Optimal range'},
-      {x0: P7_ZONE_OPTIMAL,x1: 500000,           color: 'rgba(34,197,94,0.14)',  label: 'Diminishing returns'},
+      {x0: P7_ZONE_OPTIMAL,x1: 200000,           color: 'rgba(34,197,94,0.14)',  label: 'Diminishing returns'},
     ];
     ctx.save();
     zones.forEach(z => {
