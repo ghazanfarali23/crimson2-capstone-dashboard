@@ -920,7 +920,7 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
           <div style="font-size:.79rem;line-height:1.75;color:var(--muted2)">
             <div style="margin-bottom:.5rem">
               <span class="pill pill-green" style="margin-right:.4rem">Plateau</span>
-              <strong style="color:var(--text)">ROI plateaus after ~$300K investment</strong><br>
+              <strong style="color:var(--text)">ROI plateaus after ~$200K investment</strong><br>
               Marginal returns drop sharply beyond this threshold regardless of data quality.
             </div>
             <div style="margin-bottom:.5rem">
@@ -930,7 +930,7 @@ input[type=range]{width:100%;accent-color:var(--crimson);cursor:pointer;margin:.
             </div>
             <div>
               <span class="pill pill-blue" style="margin-right:.4rem">Sweet Spot</span>
-              <strong style="color:var(--text)">$120K–$300K + ≥80% quality = optimal zone</strong><br>
+              <strong style="color:var(--text)">$120K–$200K + ≥80% quality = optimal zone</strong><br>
               This combination maximizes AI-driven ROI per dollar invested for ERP analytics.
             </div>
           </div>
@@ -1802,7 +1802,7 @@ function renderP7() {
 
   // ── Main chart: ROI vs Investment with colored zone bands ──────
   const N = 200;
-  const invRange = Array.from({length: N + 1}, (_, i) => i * (500000 / N));
+  const invRange = Array.from({length: N + 1}, (_, i) => i * (200000 / N));
   const roiCurve = invRange.map(v => calcAiROI(v, qual));
   const roiMax = Math.max(25, Math.max(...roiCurve) * 1.15);
 
@@ -1842,7 +1842,7 @@ function renderP7() {
       },
       scales: {
         x: {
-          type: 'linear', min: 0, max: 500000,
+          type: 'linear', min: 0, max: 200000,
           ticks: {color: '#7488a8', callback: v => '$' + (v/1000) + 'K'},
           grid: {color: 'rgba(31,45,74,.5)'},
           title: {display: true, text: 'AI Investment ($)', color: '#7488a8', font: {size: 11}},
